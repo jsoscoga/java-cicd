@@ -17,7 +17,7 @@ jobs:
           mkdir -p ~/.ssh
           printf "%s" "${{ secrets.HEROKU_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
+          ssh-keyscan -T 30 -H heroku.com >> ~/.ssh/known_hosts || echo "ssh-keyscan failed but continuing"
 
       - name: Push to heroku
         run: |
