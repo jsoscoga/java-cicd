@@ -27,3 +27,4 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "java-cicd-351666f1aaec"
           heroku_email: "jsos_co_gar@hotmail.com"
+          dontautocreate: 'true'
