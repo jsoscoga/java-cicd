@@ -1,0 +1,25 @@
+name: Deploy to Heroku (SSH)
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HEROKU_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
+
+      - name: Push to heroku
+        run: |
+          git remote add heroku git@heroku.com:java-cicd.git
+          git push heroku HEAD:main --force
