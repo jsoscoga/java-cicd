@@ -2,7 +2,7 @@ name: Deploy on Heroku
 
 on:
   push:
-    branches: [main]
+    branches: ["master"]
 
 jobs:
   build-and-deploy:
@@ -16,6 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
+          distribution: 'temurin'
 
       - name: Build with Maven
         run: mvn clean package
