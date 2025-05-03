@@ -25,5 +25,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "java-cicd"
+          heroku_app_name: "https://java-cicd-351666f1aaec.herokuapp.com"
           heroku_email: "jsos_co_gar@hotmail.com"
