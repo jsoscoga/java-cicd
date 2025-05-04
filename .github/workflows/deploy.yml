@@ -2,17 +2,15 @@ name: Deploy on Heroku
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    env:
-      JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin_Hotspot_jdk/17.0.15-6/x64
-
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up JDK 17
@@ -24,13 +22,20 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: java-cicd
-          heroku_email: jsos_co_gar@hotmail.com
-          usedocker: 'true'
-          branch: 'master'
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+      - name: Login to Heroku Container Registry
+        run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Push Docker image to Heroku
+        run: |
+          heroku_app_name=java-cicd
+          docker build -t registry.heroku.com/$heroku_app_name/web .
+          docker push registry.heroku.com/$heroku_app_name/web
+
+      - name: Release Docker image on Heroku
+        run: |
+          heroku_app_name=java-cicd
+          curl -n -X PATCH https://api.heroku.com/apps/$heroku_app_name/formation \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
+            -d '{"updates":[{"type":"web","docker_image":"registry.heroku.com/'"$heroku_app_name"'/web"}]}'
